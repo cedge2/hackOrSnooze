@@ -1,95 +1,80 @@
 "use strict";
 
-// global to hold the User instance of the currently-logged-in user
+// Global variable to hold the User instance of the currently-logged-in user.
 let currentUser;
 
 /******************************************************************************
- * User login/signup/login
+ * User login/signup/logout
  */
 
-/** Handle login form submission. If login ok, sets up the user instance */
-
+/** Function to handle login form submission. If login is successful, sets up the user instance */
 async function login(evt) {
-  console.debug("login", evt);
-  evt.preventDefault();
+  console.debug("login", evt); // Debug message to log the function call.
+  evt.preventDefault(); // Prevent the default form submission behavior.
 
-  // grab the username and password
+  // Get the username and password from the form inputs.
   const username = $("#login-username").val();
   const password = $("#login-password").val();
 
-  // User.login retrieves user info from API and returns User instance
-  // which we'll make the globally-available, logged-in user.
+  // Use the User.login method to retrieve user info from API and return a User instance.
   currentUser = await User.login(username, password);
 
-  $loginForm.trigger("reset");
+  $loginForm.trigger("reset"); // Reset the login form inputs.
 
-  saveUserCredentialsInLocalStorage();
-  updateUIOnUserLogin();
+  saveUserCredentialsInLocalStorage(); // Save user credentials in local storage.
+  updateUIOnUserLogin(); // Update the UI after user login.
 }
 
-$loginForm.on("submit", login);
+$loginForm.on("submit", login); // Attach login function to form submission event.
 
-/** Handle signup form submission. */
-
+/** Function to handle signup form submission. */
 async function signup(evt) {
-  console.debug("signup", evt);
-  evt.preventDefault();
+  console.debug("signup", evt); // Debug message to log the function call.
+  evt.preventDefault(); // Prevent the default form submission behavior.
 
+  // Get user details from the signup form inputs.
   const name = $("#signup-name").val();
   const username = $("#signup-username").val();
   const password = $("#signup-password").val();
 
-  // User.signup retrieves user info from API and returns User instance
-  // which we'll make the globally-available, logged-in user.
+  // Use the User.signup method to retrieve user info from API and return a User instance.
   currentUser = await User.signup(username, password, name);
 
-  saveUserCredentialsInLocalStorage();
-  updateUIOnUserLogin();
+  saveUserCredentialsInLocalStorage(); // Save user credentials in local storage.
+  updateUIOnUserLogin(); // Update the UI after user signup.
 
-  $signupForm.trigger("reset");
+  $signupForm.trigger("reset"); // Reset the signup form inputs.
 }
 
-$signupForm.on("submit", signup);
+$signupForm.on("submit", signup); // Attach signup function to form submission event.
 
-/** Handle click of logout button
- *
- * Remove their credentials from localStorage and refresh page
- */
-
+/** Function to handle click of logout button */
 function logout(evt) {
-  console.debug("logout", evt);
-  localStorage.clear();
-  location.reload();
+  console.debug("logout", evt); // Debug message to log the function call.
+  localStorage.clear(); // Clear user credentials from local storage.
+  location.reload(); // Refresh the page to log out the user.
 }
 
-$navLogOut.on("click", logout);
+$navLogOut.on("click", logout); // Attach logout function to click event of logout button.
 
 /******************************************************************************
- * Storing/recalling previously-logged-in-user with localStorage
+ * Storing/recalling previously-logged-in user with localStorage
  */
 
-/** If there are user credentials in local storage, use those to log in
- * that user. This is meant to be called on page load, just once.
- */
-
+/** Check for previously remembered user credentials in local storage. */
 async function checkForRememberedUser() {
-  console.debug("checkForRememberedUser");
+  console.debug("checkForRememberedUser"); // Debug message to log the function call.
   const token = localStorage.getItem("token");
   const username = localStorage.getItem("username");
   if (!token || !username) return false;
 
-  // try to log in with these credentials (will be null if login failed)
+  // Try to log in with the stored credentials and retrieve a User instance.
   currentUser = await User.loginViaStoredCredentials(token, username);
 }
 
-/** Sync current user information to localStorage.
- *
- * We store the username/token in localStorage so when the page is refreshed
- * (or the user revisits the site later), they will still be logged in.
- */
-
+/** Store current user information in local storage. */
 function saveUserCredentialsInLocalStorage() {
-  console.debug("saveUserCredentialsInLocalStorage");
+  console.debug("saveUserCredentialsInLocalStorage"); // Debug message to log the function call.
   if (currentUser) {
     localStorage.setItem("token", currentUser.loginToken);
     localStorage.setItem("username", currentUser.username);
@@ -97,36 +82,30 @@ function saveUserCredentialsInLocalStorage() {
 }
 
 /******************************************************************************
- * General UI stuff about users & profiles
+ * General UI functionality related to users & profiles
  */
 
-/** When a user signs up or registers, we want to set up the UI for them:
- *
- * - show the stories list
- * - update nav bar options for logged-in user
- * - generate the user profile part of the page
- */
-
+/** Update the UI when a user logs in or signs up. */
 async function updateUIOnUserLogin() {
-  console.debug("updateUIOnUserLogin");
+  console.debug("updateUIOnUserLogin"); // Debug message to log the function call.
 
-  hidePageComponents();
+  hidePageComponents(); // Hide all page components.
 
-  // re-display stories (so that "favorite" stars can appear)
-  putStoriesOnPage();
-  $allStoriesList.show();
+  putStoriesOnPage(); // Re-display stories to show "favorite" stars.
+  $allStoriesList.show(); // Show the list of stories.
 
-  updateNavOnLogin();
-  generateUserProfile();
-  $storiesContainer.show()
+  updateNavOnLogin(); // Update the navigation bar for a logged-in user.
+  generateUserProfile(); // Generate the user profile section.
+  $storiesContainer.show(); // Show the stories container.
 }
 
-/** Show a "user profile" part of page built from the current user's info. */
-
+/** Generate and display the user profile section on the page. */
 function generateUserProfile() {
-  console.debug("generateUserProfile");
+  console.debug("generateUserProfile"); // Debug message to log the function call.
 
+  // Update profile information with the current user's details.
   $("#profile-name").text(currentUser.name);
   $("#profile-username").text(currentUser.username);
-  $("#profile-account-date").text(currentUser.createdAt.slice(0, 10));
+  $("#profile-account-date").text(currentUser.createdAt.slice(0, 10)); // Display account creation date.
 }
+
