@@ -1,17 +1,13 @@
 <!DOCTYPE html>
+<!-- Hack or Snooze HTML Page
+   This is the only HTML page that the application manipulates during use.
 
-<!-- Hack or Snooze
-
-     This is the only HTML page; the applications manipulates this DOM
-     during use.
-
-     Primary authors:
-     - Michael Hueter: initial creation, 2018
-     - Elie Schoppik: refactoring using OO, 2019
-     - Joel Burton: refactored and componentized, 2020
-     - You!
-  -->
-
+   Primary authors:
+   - Michael Hueter: initial creation, 2018
+   - Elie Schoppik: refactoring using OO, 2019
+   - Joel Burton: refactored and componentized, 2020
+   - You!
+-->
 <html lang="en">
 
 <head>
@@ -19,11 +15,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Hack or Snooze</title>
-  <link
-      rel="stylesheet"
-      href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
-      integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU"
-      crossorigin="anonymous">
+  <!-- Link to Font Awesome CSS for icons -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css"
+    integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
+  <!-- Link to custom CSS files -->
   <link rel="stylesheet" href="css/site.css">
   <link rel="stylesheet" href="css/user.css">
   <link rel="stylesheet" href="css/stories.css">
@@ -32,12 +27,14 @@
 
 <body>
 
-<!-- top navigation bar -->
+<!-- Top navigation bar -->
 <nav>
   <div class="navbar-brand">
+    <!-- Site logo and link to home -->
     <a class="nav-link" href="#" id="nav-all">Hack or Snooze</a>
   </div>
   <div class="main-nav-links hidden">
+    <!-- Navigation links for main actions -->
     |
     <a class="nav-link" href="#" id="nav-submit-story">submit</a>
     |
@@ -46,16 +43,17 @@
     <a class="nav-link" href="#" id="nav-my-stories">my&nbsp;stories</a>
   </div>
   <div class="nav-right">
+    <!-- Navigation links for user account actions -->
     <a class="nav-link" href="#" id="nav-login">login/signup</a>
     <a class="nav-link" href="#" id="nav-user-profile"></a>
     <a class="hidden" id="nav-logout" href="#"><small>(logout)</small></a>
   </div>
 </nav>
 
-<!-- area for stories (all stories, user stories, favorites) -->
+<!-- Area for stories (all stories, user stories, favorites) -->
 <section id="stories-container" class="stories-container container">
 
-  <!-- form for submitted new story -->
+  <!-- Form for submitting new story -->
   <form action="" class="hidden" id="submit-form">
     <div>
       <label for="create-author">author</label>
@@ -73,7 +71,7 @@
     <hr>
   </form>
 
-  <!-- loading message (removed by JS after stories loaded) -->
+  <!-- Loading message (removed by JS after stories are loaded) -->
   <div id="stories-loading-msg">Loading&hellip;</div>
 
   <!-- List of all stories -->
@@ -106,11 +104,7 @@
   </form>
 
   <!-- Signup form -->
-  <form
-      action="#"
-      id="signup-form"
-      class="account-form hidden"
-      method="post">
+  <form action="#" id="signup-form" class="account-form hidden" method="post">
     <h4>Create Account</h4>
     <div class="login-input">
       <label for="signup-name">name</label>
@@ -120,35 +114,4 @@
       <label for="signup-username">username</label>
       <input id="signup-username" autocomplete="new-username">
     </div>
-    <div class="login-input">
-      <label for="signup-password">password</label>
-      <input id="signup-password" autocomplete="new-password" type="password">
-    </div>
-    <button type="submit">create account</button>
-  </form>
-</section>
-
-<!-- User profile -->
-<section id="user-profile" class="hidden">
-  <div class="user-profile-box container">
-    <h4>User Profile Info</h4>
-    <section>
-      <div>Name: <span id="profile-name">Name:</span></div>
-      <div>Username: <span id="profile-username">Username:</span></div>
-      <div>Account Created: <span id="profile-account-date"></span></div>
-    </section>
-  </div>
-</section>
-
-<!-- Library JS & our JS -->
-<script src="https://unpkg.com/jquery"></script>
-<script src="https://unpkg.com/axios/dist/axios.js"></script>
-
-<script src="js/models.js"></script>
-<script src="js/main.js"></script>
-<script src="js/nav.js"></script>
-<script src="js/user.js"></script>
-<script src="js/stories.js"></script>
-
-</body>
-</html>
+    <div
