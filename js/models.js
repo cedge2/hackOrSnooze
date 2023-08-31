@@ -1,14 +1,15 @@
 "use strict";
 
+// Define the base URL for API requests.
 const BASE_URL = "https://hack-or-snooze-v3.herokuapp.com";
 
 /******************************************************************************
- * Story: a single story in the system
+ * Story: Represents a single story in the system
  */
 
 class Story {
 
-  /** Make instance of Story from data object about story:
+  /** Create a new Story instance using story data.
    *   - {storyId, title, author, url, username, createdAt}
    */
 
@@ -21,16 +22,15 @@ class Story {
     this.createdAt = createdAt;
   }
 
-  /** Parses hostname out of URL and returns it. */
+  /** Extract the hostname from the URL and return it. */
 
   getHostName() {
     return new URL(this.url).host;
   }
 }
 
-
 /******************************************************************************
- * List of Story instances: used by UI to show story lists in DOM.
+ * StoryList: Represents a list of Story instances, used to show story lists in the UI
  */
 
 class StoryList {
@@ -38,38 +38,27 @@ class StoryList {
     this.stories = stories;
   }
 
-  /** Generate a new StoryList. It:
-   *
-   *  - calls the API
-   *  - builds an array of Story instances
-   *  - makes a single StoryList instance out of that
-   *  - returns the StoryList instance.
+  /** Fetch and create a StoryList instance.
+   *  - Make an API request.
+   *  - Create Story instances from the response.
+   *  - Return the StoryList instance.
    */
 
   static async getStories() {
-    // Note presence of `static` keyword: this indicates that getStories is
-    //  **not** an instance method. Rather, it is a method that is called on the
-    //  class directly. Why doesn't it make sense for getStories to be an
-    //  instance method?
-
-    // query the /stories endpoint (no auth required)
     const response = await axios({
       url: `${BASE_URL}/stories`,
       method: "GET",
     });
 
-    // turn plain old story objects from API into instances of Story class
     const stories = response.data.stories.map(story => new Story(story));
 
-    // build an instance of our own class using the new array of stories
     return new StoryList(stories);
   }
 
-  /** Adds story data to API, makes a Story instance, adds it to story list.
-   * - user - the current instance of User who will post the story
-   * - obj of {title, author, url}
-   *
-   * Returns the new Story instance
+  /** Add a new story to the API and update the StoryList.
+   * - user: The current User instance.
+   * - obj: {title, author, url}.
+   * Returns the new Story instance.
    */
 
   async addStory(user, { title, author, url }) {
@@ -87,10 +76,9 @@ class StoryList {
     return story;
   }
 
-  /** Delete story from API and remove from the story lists.
-   *
-   * - user: the current User instance
-   * - storyId: the ID of the story you want to remove
+  /** Delete a story from the API and update the StoryList.
+   * - user: The current User instance.
+   * - storyId: The ID of the story to remove.
    */
 
   async removeStory(user, storyId) {
@@ -101,24 +89,20 @@ class StoryList {
       data: { token: user.loginToken }
     });
 
-    // filter out the story whose ID we are removing
     this.stories = this.stories.filter(story => story.storyId !== storyId);
-
-    // do the same thing for the user's list of stories & their favorites
     user.ownStories = user.ownStories.filter(s => s.storyId !== storyId);
     user.favorites = user.favorites.filter(s => s.storyId !== storyId);
   }
 }
 
-
 /******************************************************************************
- * User: a user in the system (only used to represent the current user)
+ * User: Represents a user in the system (only used to represent the current user)
  */
 
 class User {
-  /** Make user instance from obj of user data and a token:
-   *   - {username, name, createdAt, favorites[], ownStories[]}
-   *   - token
+  /** Create a User instance from user data and a token.
+   * - {username, name, createdAt, favorites[], ownStories[]}
+   * - token
    */
 
   constructor({
@@ -133,19 +117,16 @@ class User {
     this.name = name;
     this.createdAt = createdAt;
 
-    // instantiate Story instances for the user's favorites and ownStories
     this.favorites = favorites.map(s => new Story(s));
     this.ownStories = ownStories.map(s => new Story(s));
 
-    // store the login token on the user so it's easy to find for API calls.
     this.loginToken = token;
   }
 
-  /** Register new user in API, make User instance & return it.
-   *
-   * - username: a new username
-   * - password: a new password
-   * - name: the user's full name
+  /** Register a new user via the API and return a User instance.
+   * - username: A new username.
+   * - password: A new password.
+   * - name: The user's full name.
    */
 
   static async signup(username, password, name) {
@@ -169,10 +150,9 @@ class User {
     );
   }
 
-  /** Login in user with API, make User instance & return it.
-
-   * - username: an existing user's username
-   * - password: an existing user's password
+  /** Log in a user via the API and return a User instance.
+   * - username: An existing user's username.
+   * - password: An existing user's password.
    */
 
   static async login(username, password) {
@@ -196,8 +176,9 @@ class User {
     );
   }
 
-  /** When we already have credentials (token & username) for a user,
-   *   we can log them in automatically. This function does that.
+  /** Log in a user automatically via stored credentials.
+   * - token: The user's login token.
+   * - username: The user's username.
    */
 
   static async loginViaStoredCredentials(token, username) {
@@ -226,8 +207,8 @@ class User {
     }
   }
 
-  /** Add a story to the list of user favorites and update the API
-   * - story: a Story instance to add to favorites
+  /** Add a story to the user's list of favorites and update the API.
+   * - story: The Story instance to add to favorites.
    */
 
   async addFavorite(story) {
@@ -235,8 +216,8 @@ class User {
     await this._addOrRemoveFavorite("add", story)
   }
 
-  /** Remove a story to the list of user favorites and update the API
-   * - story: the Story instance to remove from favorites
+  /** Remove a story from the user's list of favorites and update the API.
+   * - story: The Story instance to remove from favorites.
    */
 
   async removeFavorite(story) {
@@ -244,9 +225,9 @@ class User {
     await this._addOrRemoveFavorite("remove", story);
   }
 
-  /** Update API with favorite/not-favorite.
-   *   - newState: "add" or "remove"
-   *   - story: Story instance to make favorite / not favorite
+  /** Update the API with a favorite/unfavorite action.
+   * - newState: "add" or "remove".
+   * - story: The Story instance to make a favorite or not favorite.
    * */
 
   async _addOrRemoveFavorite(newState, story) {
@@ -259,9 +240,10 @@ class User {
     });
   }
 
-  /** Return true/false if given Story instance is a favorite of this user. */
+  /** Check if a given Story instance is a favorite of this user.
+   * - story: The Story instance to check.
+   */
 
   isFavorite(story) {
-    return this.favorites.some(s => (s.storyId === story.storyId));
-  }
-}
+    return this.favorites.some(s =>
+
