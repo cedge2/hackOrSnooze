@@ -245,5 +245,6 @@ class User {
    */
 
   isFavorite(story) {
-    return this.favorites.some(s =>
-
+    return this.favorites.some(s => (s.storyId === story.storyId));
+  }
+}
